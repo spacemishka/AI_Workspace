@@ -67,7 +67,6 @@ docker/grafana/provisioning/dashboards/tmp/
 *.swp
 *.swo
 *~
-backend/
 .project
 .classpath
 *.launch
@@ -86,9 +85,6 @@ $RECYCLE.BIN/
 *.log
 logs/
 *.pid
-
-# ── Alembic ───────────────────────────────────────────────────────────────────
-# Keep migrations tracked — do not ignore alembic/versions/
 
 # ── Temp / Scratch ────────────────────────────────────────────────────────────
 tmp/
