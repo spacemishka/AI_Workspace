@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    AI Workspace — Interactive Setup Wizard
+    AI Workspace - Interactive Setup Wizard
 .DESCRIPTION
     Automates the full first-time setup of the AI Workspace:
     - Prerequisite checks
@@ -31,10 +31,10 @@ $ErrorActionPreference = "Stop"
 function Write-Banner {
     $banner = @"
 
-  ╔══════════════════════════════════════════════════════╗
-  ║         AI Workspace — Setup Wizard                  ║
-  ║         Privacy-first · Local-first · Modular        ║
-  ╚══════════════════════════════════════════════════════╝
+  +------------------------------------------------------+
+  |         AI Workspace - Setup Wizard                  |
+  |         Privacy-first * Local-first * Modular        |
+  +------------------------------------------------------+
 
 "@
     Write-Host $banner -ForegroundColor Cyan
@@ -46,10 +46,10 @@ function Write-Step {
     Write-Host $Text -ForegroundColor White
 }
 
-function Write-Ok   { param([string]$Text); Write-Host "    ✓ $Text" -ForegroundColor Green }
-function Write-Warn { param([string]$Text); Write-Host "    ⚠ $Text" -ForegroundColor Yellow }
-function Write-Fail { param([string]$Text); Write-Host "    ✗ $Text" -ForegroundColor Red }
-function Write-Info { param([string]$Text); Write-Host "    → $Text" -ForegroundColor Gray }
+function Write-Ok   { param([string]$Text); Write-Host "    [OK] $Text" -ForegroundColor Green }
+function Write-Warn { param([string]$Text); Write-Host "    [!] $Text" -ForegroundColor Yellow }
+function Write-Fail { param([string]$Text); Write-Host "    [X] $Text" -ForegroundColor Red }
+function Write-Info { param([string]$Text); Write-Host "    -> $Text" -ForegroundColor Gray }
 
 function Prompt-Value {
     param(
@@ -109,7 +109,7 @@ function Wait-Healthy {
         Write-Host "." -NoNewline -ForegroundColor Gray
     }
     Write-Host ""
-    Write-Warn "$Service did not become healthy within ${MaxSeconds}s — check: docker compose logs $Service"
+    Write-Warn "$Service did not become healthy within ${MaxSeconds}s - check: docker compose logs $Service"
     return $false
 }
 
@@ -126,7 +126,7 @@ if (-not (Test-Path "docker-compose.yml")) {
 }
 
 # ==============================================================================
-# Step 1 — Prerequisites
+# Step 1 - Prerequisites
 # ==============================================================================
 
 Write-Step "1" "Checking prerequisites..."
@@ -156,12 +156,12 @@ if (-not $SkipPrereqCheck) {
         $pyVer = (python --version) -replace "Python ", ""
         $major, $minor = $pyVer.Split(".")[0..1] | ForEach-Object { [int]$_ }
         if ($major -lt 3 -or ($major -eq 3 -and $minor -lt 12)) {
-            Write-Warn "Python $pyVer found — 3.12+ recommended."
+            Write-Warn "Python $pyVer found - 3.12+ recommended."
         } else {
             Write-Ok "Python: $pyVer"
         }
     } catch {
-        Write-Warn "Python not found — secret generation will use fallback method."
+        Write-Warn "Python not found - secret generation will use fallback method."
     }
 
     # NVIDIA driver
@@ -171,7 +171,7 @@ if (-not $SkipPrereqCheck) {
             Write-Ok "NVIDIA GPU: $($smi.Trim())"
         }
     } catch {
-        Write-Warn "nvidia-smi not found — GPU acceleration won't work. Install NVIDIA drivers."
+        Write-Warn "nvidia-smi not found - GPU acceleration will not work. Install NVIDIA drivers."
     }
 
     # Git
@@ -187,16 +187,16 @@ if (-not $SkipPrereqCheck) {
 }
 
 # ==============================================================================
-# Step 2 — Inference Backend Selection
+# Step 2 - Inference Backend Selection
 # ==============================================================================
 
 Write-Step "2" "Select local inference backend"
-Write-Info "All backends expose an OpenAI-compatible API — switching later is a config change only."
+Write-Info "All backends expose an OpenAI-compatible API - switching later is a config change only."
 
 $backendOptions = @(
-    "Ollama          (recommended — Docker, multi-model, GPU-accelerated)",
+    "Ollama          (recommended - Docker, multi-model, GPU-accelerated)",
     "llama.cpp       (Docker, single GGUF model, maximum control)",
-    "LM Studio       (native Windows app — must be installed separately)"
+    "LM Studio       (native Windows app - must be installed separately)"
 )
 $backendIdx = Show-Menu -Title "Inference Backend:" -Options $backendOptions
 
@@ -204,17 +204,18 @@ $backend = @("ollama", "llamacpp", "lmstudio")[$backendIdx]
 Write-Ok "Selected: $($backendOptions[$backendIdx].Split(" ")[0])"
 
 # ==============================================================================
-# Step 3 — .env Configuration
+# Step 3 - .env Configuration
 # ==============================================================================
 
 Write-Step "3" "Environment configuration"
 
+$skipEnv = $false
 if (Test-Path ".env") {
     Write-Warn ".env already exists."
     Write-Host "    Overwrite it? [y/N] : " -ForegroundColor Yellow -NoNewline
     $overwrite = Read-Host
     if ($overwrite -notmatch "^[Yy]$") {
-        Write-Info "Keeping existing .env — skipping configuration."
+        Write-Info "Keeping existing .env - skipping configuration."
         $skipEnv = $true
     }
 }
@@ -231,7 +232,7 @@ if (-not $skipEnv) {
         $jwtSecret        = [System.Guid]::NewGuid().ToString("N") + [System.Guid]::NewGuid().ToString("N")
         $langfuseNextauth = [System.Guid]::NewGuid().ToString("N") + [System.Guid]::NewGuid().ToString("N")
         $langfuseSalt     = [System.Guid]::NewGuid().ToString("N")
-        Write-Warn "Python unavailable — secrets generated with GUID fallback (less entropy)."
+        Write-Warn "Python unavailable - secrets generated with GUID fallback (less entropy)."
     } else {
         Write-Ok "Secrets generated"
     }
@@ -260,51 +261,51 @@ if (-not $skipEnv) {
     # Write .env
     $envContent = @"
 # =============================================================================
-# AI Workspace — Environment Variables
+# AI Workspace - Environment Variables
 # Generated by setup.ps1 on $(Get-Date -Format "yyyy-MM-dd HH:mm")
 # NEVER commit this file to version control.
 # =============================================================================
 
-# ── Environment ───────────────────────────────────────────────────────────────
+# -- Environment ---------------------------------------------------------------
 ENVIRONMENT=development
 
-# ── PostgreSQL ────────────────────────────────────────────────────────────────
+# -- PostgreSQL ----------------------------------------------------------------
 POSTGRES_USER=$postgresUser
 POSTGRES_PASSWORD=$postgresPassword
 POSTGRES_DB=$postgresDb
 
-# ── Redis ─────────────────────────────────────────────────────────────────────
+# -- Redis ---------------------------------------------------------------------
 REDIS_PASSWORD=$redisPassword
 
-# ── Qdrant ────────────────────────────────────────────────────────────────────
+# -- Qdrant --------------------------------------------------------------------
 QDRANT_API_KEY=
 
-# ── Local Inference — Backend: $backend ────────────────────────────────────────
+# -- Local Inference - Backend: $backend ----------------------------------------
 LOCAL_INFERENCE_BASE_URL=$inferenceUrl
 OLLAMA_DEFAULT_MODEL=$ollamaDefault
 OLLAMA_EMBED_MODEL=$ollamaEmbed
 
-# ── Cloud Provider (OpenRouter — pluggable) ───────────────────────────────────
+# -- Cloud Provider (OpenRouter - pluggable) -----------------------------------
 CLOUD_PROVIDER=openrouter
 OPENROUTER_API_KEY=$openrouterKey
 OPENROUTER_DEFAULT_MODEL=$openrouterModel
 
-# ── Security ──────────────────────────────────────────────────────────────────
+# -- Security ------------------------------------------------------------------
 JWT_SECRET_KEY=$jwtSecret
 JWT_EXPIRE_MINUTES=60
 
-# ── Langfuse (LLM Tracing) ────────────────────────────────────────────────────
+# -- Langfuse (LLM Tracing) ----------------------------------------------------
 LANGFUSE_NEXTAUTH_SECRET=$langfuseNextauth
 LANGFUSE_SALT=$langfuseSalt
 # Fill these in after first Langfuse login (Settings > API Keys)
 LANGFUSE_PUBLIC_KEY=
 LANGFUSE_SECRET_KEY=
 
-# ── Grafana ───────────────────────────────────────────────────────────────────
+# -- Grafana -------------------------------------------------------------------
 GRAFANA_ADMIN_USER=admin
 GRAFANA_ADMIN_PASSWORD=$grafanaPassword
 
-# ── Frontend ──────────────────────────────────────────────────────────────────
+# -- Frontend ------------------------------------------------------------------
 VITE_API_BASE_URL=http://localhost:8000
 VITE_WS_BASE_URL=ws://localhost:8000
 "@
@@ -314,14 +315,14 @@ VITE_WS_BASE_URL=ws://localhost:8000
 }
 
 # ==============================================================================
-# Step 4 — LM Studio instructions (if selected)
+# Step 4 - LM Studio instructions (if selected)
 # ==============================================================================
 
 if ($backend -eq "lmstudio") {
     Write-Step "4" "LM Studio setup"
     Write-Host @"
 
-    LM Studio runs natively on Windows — NOT in Docker.
+    LM Studio runs natively on Windows - NOT in Docker.
 
     Before continuing:
       1. Download LM Studio from https://lmstudio.ai
@@ -329,7 +330,7 @@ if ($backend -eq "lmstudio") {
       3. Go to the Search tab and download a model (recommended: Q4_K_M of any 7B model)
       4. Go to the Local Server tab
       5. Select your model, enable CORS, set GPU layers to max
-      6. Click Start Server — confirm it shows "listening on port 1234"
+      6. Click Start Server - confirm it shows "listening on port 1234"
 
 "@ -ForegroundColor Yellow
 
@@ -341,14 +342,14 @@ if ($backend -eq "lmstudio") {
         $response = Invoke-WebRequest -Uri "http://localhost:1234/v1/models" -TimeoutSec 5 -UseBasicParsing
         Write-Ok "LM Studio is reachable at http://localhost:1234"
     } catch {
-        Write-Warn "LM Studio did not respond at localhost:1234 — ensure the server is started."
+        Write-Warn "LM Studio did not respond at localhost:1234 - ensure the server is started."
         Write-Host "    Continue anyway? [y/N] : " -ForegroundColor Yellow -NoNewline
         if ((Read-Host) -notmatch "^[Yy]$") { exit 1 }
     }
 }
 
 # ==============================================================================
-# Step 5 — Start Docker Stack
+# Step 5 - Start Docker Stack
 # ==============================================================================
 
 Write-Step "5" "Starting Docker infrastructure"
@@ -374,7 +375,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Ok "Services started"
 
 # ==============================================================================
-# Step 6 — Wait for Core Services
+# Step 6 - Wait for Core Services
 # ==============================================================================
 
 Write-Step "6" "Waiting for services to become healthy"
@@ -384,7 +385,7 @@ Wait-Healthy "redis"    30 | Out-Null
 Wait-Healthy "qdrant"   30 | Out-Null
 
 # ==============================================================================
-# Step 7 — Pull Ollama Models
+# Step 7 - Pull Ollama Models
 # ==============================================================================
 
 if ($backend -eq "ollama") {
@@ -402,7 +403,7 @@ if ($backend -eq "ollama") {
 
     Write-Host ""
     Write-Info "Models to pull: $($modelsToPull -join ', ')"
-    Write-Info "(You can add more later with: docker exec ai-ollama ollama pull <model>)"
+    Write-Info "(You can add more later with: docker exec ai-ollama ollama pull [model])"
     Write-Host ""
 
     foreach ($model in $modelsToPull) {
@@ -411,7 +412,7 @@ if ($backend -eq "ollama") {
         if ($LASTEXITCODE -eq 0) {
             Write-Ok "Pulled: $model"
         } else {
-            Write-Warn "Failed to pull $model — you can retry with: docker exec ai-ollama ollama pull $model"
+            Write-Warn "Failed to pull $model - you can retry with: docker exec ai-ollama ollama pull $model"
         }
     }
 
@@ -422,24 +423,23 @@ if ($backend -eq "ollama") {
 }
 
 # ==============================================================================
-# Step 8 — Start App Services (unless --InfraOnly)
+# Step 8 - Start App Services (unless --InfraOnly)
 # ==============================================================================
 
 if (-not $InfraOnly) {
-    # Only start if Dockerfiles exist
     if ((Test-Path "backend/Dockerfile") -and (Test-Path "frontend/Dockerfile")) {
         Write-Step "8" "Starting application services"
         docker compose up -d backend worker frontend
         Write-Ok "Application services started"
     } else {
         Write-Step "8" "Application services"
-        Write-Warn "backend/Dockerfile or frontend/Dockerfile not found — skipping."
+        Write-Warn "backend/Dockerfile or frontend/Dockerfile not found - skipping."
         Write-Info "Run backend and frontend locally during development."
     }
 }
 
 # ==============================================================================
-# Step 9 — Verification Summary
+# Step 9 - Verification Summary
 # ==============================================================================
 
 Write-Step "9" "Verification"
@@ -467,29 +467,29 @@ if ($backend -eq "lmstudio") {
 foreach ($check in $checks) {
     try {
         $result = & $check.Cmd
-        if ($result) { Write-Ok $check.Name } else { Write-Warn "$($check.Name) — unexpected response" }
+        if ($result) { Write-Ok $check.Name } else { Write-Warn "$($check.Name) - unexpected response" }
     } catch {
-        Write-Warn "$($check.Name) — not reachable yet (may still be starting)"
+        Write-Warn "$($check.Name) - not reachable yet (may still be starting)"
     }
 }
 
 # ==============================================================================
-# Done — Print Service URLs
+# Done - Print Service URLs
 # ==============================================================================
 
 Write-Host @"
 
-  ╔══════════════════════════════════════════════════════╗
-  ║  Setup complete! Service URLs:                       ║
-  ╠══════════════════════════════════════════════════════╣
-  ║  Backend API   →  http://localhost:8000              ║
-  ║  API Docs      →  http://localhost:8000/docs         ║
-  ║  Frontend      →  http://localhost:5173              ║
-  ║  Langfuse      →  http://localhost:3001              ║
-  ║  Grafana       →  http://localhost:3002              ║
-  ║  Prometheus    →  http://localhost:9090              ║
-  ║  Qdrant        →  http://localhost:6333/dashboard    ║
-  ╚══════════════════════════════════════════════════════╝
+  +------------------------------------------------------+
+  |  Setup complete! Service URLs:                       |
+  +------------------------------------------------------+
+  |  Backend API   ->  http://localhost:8000              |
+  |  API Docs      ->  http://localhost:8000/docs         |
+  |  Frontend      ->  http://localhost:5173              |
+  |  Langfuse      ->  http://localhost:3001              |
+  |  Grafana       ->  http://localhost:3002              |
+  |  Prometheus    ->  http://localhost:9090              |
+  |  Qdrant        ->  http://localhost:6333/dashboard    |
+  +------------------------------------------------------+
 
   Next step: Open Langfuse at http://localhost:3001
   Sign up, create an API key, then add it to .env:
@@ -498,8 +498,8 @@ Write-Host @"
 
   Useful commands:
     docker compose ps                    # service status
-    docker compose logs -f <service>     # tail logs
-    docker compose restart <service>     # restart a service
+    docker compose logs -f [service]     # tail logs
+    docker compose restart [service]     # restart a service
     docker compose down                  # stop everything
 
 "@ -ForegroundColor Cyan
