@@ -73,7 +73,7 @@ services:
       - "6333:6333" # REST API
       - "6334:6334" # gRPC
     healthcheck:
-      test: [ "CMD-SHELL", "curl -sf http://localhost:6333/healthz || exit 1" ]
+      test: [ "CMD-SHELL", "bash -c '</dev/tcp/localhost/6333' || exit 1" ]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -279,7 +279,7 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "curl -sf http://localhost:3000/api/public/health || exit 1" ]
+      test: [ "CMD-SHELL", "node -e \"fetch('http://localhost:3000/api/public/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))\"" ]
       interval: 30s
       timeout: 10s
       retries: 5
