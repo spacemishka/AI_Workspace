@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # ── Development Stage ─────────────────────────────────────────────────────────
 FROM base AS development
 
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 RUN pip install hatchling && pip install -e ".[dev]"
 
 COPY . .
@@ -31,7 +31,7 @@ CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000", "--re
 # ── Production Stage ──────────────────────────────────────────────────────────
 FROM base AS production
 
-COPY pyproject.toml ./
+COPY pyproject.toml README.md ./
 RUN pip install hatchling && pip install .
 
 COPY ./src ./src
