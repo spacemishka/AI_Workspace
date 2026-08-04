@@ -194,6 +194,7 @@ services:
       QDRANT_API_KEY: ${QDRANT_API_KEY:-}
       # Local Inference
       OLLAMA_BASE_URL: http://ollama:11434
+      LOCAL_INFERENCE_BASE_URL: http://ollama:11434/v1
       OLLAMA_DEFAULT_MODEL: ${OLLAMA_DEFAULT_MODEL:-llama3.1:8b}
       OLLAMA_EMBED_MODEL: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}
       # Cloud Provider (OpenRouter — pluggable)
