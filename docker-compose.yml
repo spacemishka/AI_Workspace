@@ -109,6 +109,29 @@ services:
     networks:
       - ai-network
 
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: ai-open-webui
+    restart: unless-stopped
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-}
+    volumes:
+      - open_webui_data:/app/backend/data
+    ports:
+      - "3080:8080"
+    depends_on:
+      ollama:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD-SHELL", "bash -c '</dev/tcp/localhost/8080' || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - ai-network
+
   llamacpp:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
     container_name: ai-llamacpp
@@ -336,6 +359,8 @@ volumes:
     name: ai-workspace-qdrant
   ollama_data:
     name: ai-workspace-ollama
+  open_webui_data:
+    name: ai-workspace-open-webui
   prometheus_data:
     name: ai-workspace-prometheus
   grafana_data:

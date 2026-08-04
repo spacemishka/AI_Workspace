@@ -357,7 +357,7 @@ Write-Step "5" "Starting Docker infrastructure"
 $coreServices = "postgres redis qdrant langfuse prometheus grafana"
 
 $inferenceService = switch ($backend) {
-    "ollama"   { "ollama" }
+    "ollama"   { "ollama open-webui" }
     "llamacpp" { "llamacpp" }
     "lmstudio" { "" }  # runs outside Docker
 }
@@ -500,6 +500,7 @@ Write-Host @"
   +------------------------------------------------------+
   |  Setup complete! Service URLs:                       |
   +------------------------------------------------------+
+  |  Open WebUI    ->  http://localhost:3080              |
   |  Backend API   ->  http://localhost:8000              |
   |  API Docs      ->  http://localhost:8000/docs         |
   |  Frontend      ->  http://localhost:5173              |

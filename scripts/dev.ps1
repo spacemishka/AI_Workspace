@@ -16,7 +16,7 @@ switch ($Command) {
 
     "start" {
         Write-Header "Starting infrastructure..."
-        docker compose up -d postgres redis qdrant ollama langfuse prometheus grafana
+        docker compose up -d postgres redis qdrant ollama open-webui langfuse prometheus grafana
         Write-Host "  Done. Run 'dev.ps1 status' to check." -ForegroundColor Green
     }
 
@@ -85,6 +85,7 @@ switch ($Command) {
         Write-Host @"
 
   Service URLs:
+    Open WebUI    ->  http://localhost:3080
     Backend API   ->  http://localhost:8000
     API Docs      ->  http://localhost:8000/docs
     Frontend      ->  http://localhost:5173
