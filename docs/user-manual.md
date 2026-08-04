@@ -78,9 +78,17 @@ GET /api/v1/financials/{ticker}/analysis
 - `wacc` *(float, default: `0.09`)*: Weighted Average Cost of Capital discount rate (9%).
 - `growth_rate` *(float, default: `0.10`)*: 5-year expected annual Free Cash Flow growth rate (10%).
 
+> [!TIP]
+> **Windows PowerShell Users**: In PowerShell, `curl` is aliased to `Invoke-WebRequest`. Use `curl.exe` or `Invoke-RestMethod` instead:
+> ```powershell
+> curl.exe "http://localhost:8000/api/v1/financials/AAPL/analysis?wacc=0.09&growth_rate=0.10"
+> # or:
+> Invoke-RestMethod "http://localhost:8000/api/v1/financials/AAPL/analysis"
+> ```
+
 #### Example Request (`cURL`):
 ```bash
-curl -X GET "http://localhost:8000/api/v1/financials/AAPL/analysis?wacc=0.09&growth_rate=0.10"
+curl.exe -X GET "http://localhost:8000/api/v1/financials/AAPL/analysis?wacc=0.09&growth_rate=0.10"
 ```
 
 #### Example JSON Response:
