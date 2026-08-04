@@ -1,0 +1,96 @@
+# =============================================================================
+# AI Workspace — .gitignore
+# =============================================================================
+
+# ── Secrets & Environment ─────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.crt
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+.eggs/
+*.egg-info/
+dist/
+build/
+*.egg
+pip-wheel-metadata/
+
+# Type checking
+.mypy_cache/
+.pyright/
+.ruff_cache/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+
+# ── Node / Frontend ───────────────────────────────────────────────────────────
+node_modules/
+dist/
+.next/
+out/
+.nuxt/
+.cache/
+*.tsbuildinfo
+
+# ── Local AI Models ───────────────────────────────────────────────────────────
+# GGUF model files are large — store locally, never commit
+models/
+*.gguf
+*.bin
+*.ggml
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+# Named volumes are managed by Docker — no need to track
+docker/grafana/provisioning/dashboards/tmp/
+
+# ── IDE & Editor ──────────────────────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+*.launch
+*.sublime-workspace
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+*.pid
+
+# ── Alembic ───────────────────────────────────────────────────────────────────
+# Keep migrations tracked — do not ignore alembic/versions/
+
+# ── Temp / Scratch ────────────────────────────────────────────────────────────
+tmp/
+temp/
+scratch/
+.tmp/
