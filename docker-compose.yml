@@ -35,7 +35,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aiworkspace}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aiworkspace} -d ${POSTGRES_DB:-aiworkspace}" ]
       interval: 10s
       timeout: 5s
       retries: 5
