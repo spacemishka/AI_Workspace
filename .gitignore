@@ -67,6 +67,7 @@ docker/grafana/provisioning/dashboards/tmp/
 *.swp
 *.swo
 *~
+backend/
 .project
 .classpath
 *.launch
