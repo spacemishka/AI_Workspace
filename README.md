@@ -4,50 +4,27 @@ Privacy-first, local AI assistant running on consumer hardware.
 
 ## Quick Start
 
-### 1. Prerequisites
+### Automated Setup (Recommended)
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) with WSL2 backend
-- NVIDIA Container Toolkit (for GPU support with Ollama)
-- Git
+Run the interactive setup wizard — it handles everything:
 
-### 2. Setup
-
-```bash
-# Clone the repository
+```powershell
 git clone <repo-url>
 cd ai-workspace
-
-# Create your environment file
-copy .env.example .env
-# Edit .env and fill in all required values
+.\setup.ps1
 ```
 
-### 3. Start Infrastructure (Development)
+The wizard will:
+- ✅ Check all prerequisites (Docker, GPU, Python)
+- ✅ Ask you to choose an inference backend (Ollama / llama.cpp / LM Studio)
+- ✅ Generate secrets and create your `.env`
+- ✅ Start the Docker stack
+- ✅ Pull Ollama models
+- ✅ Verify all services are healthy
 
-Start only the infrastructure services, run backend and frontend locally:
+### Manual Setup
 
-```bash
-docker compose up -d postgres redis qdrant ollama langfuse prometheus grafana
-```
-
-### 4. Start Full Stack
-
-```bash
-docker compose up -d
-```
-
-### 5. Pull Default Ollama Models
-
-```bash
-# Chat model
-docker exec ai-ollama ollama pull llama3.1:8b
-
-# Coding model
-docker exec ai-ollama ollama pull qwen2.5-coder:7b
-
-# Embedding model (required for RAG)
-docker exec ai-ollama ollama pull nomic-embed-text
-```
+See [docs/setup-guide.md](docs/setup-guide.md) for step-by-step instructions for each backend.
 
 ## Service URLs
 
