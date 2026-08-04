@@ -143,10 +143,10 @@ if (-not $SkipPrereqCheck) {
     }
 
     # Docker running
-    try {
-        docker info *>$null
+    $null = docker info --format '{{.ServerVersion}}' 2>&1
+    if ($LASTEXITCODE -eq 0) {
         Write-Ok "Docker daemon is running"
-    } catch {
+    } else {
         Write-Fail "Docker daemon is not running. Start Docker Desktop and try again."
         exit 1
     }
