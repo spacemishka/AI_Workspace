@@ -95,3 +95,7 @@ tmp/
 temp/
 scratch/
 .tmp/
+
+# ── Agents (Local Only) ───────────────────────────────────────────────────────
+.agents/
+backend/src/agents/
