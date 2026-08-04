@@ -108,14 +108,27 @@ services:
       start_period: 20s
     networks:
       - ai-network
-  lamacpp:
+
+  llamacpp:
     image: ghcr.io/ggerganov/llama.cpp:server-cuda
     container_name: ai-llamacpp
     restart: unless-stopped
     volumes:
-      - ./models:/models # drop your .gguf files here
-    command: >
-      --model /models/llama-3.1-8b-q4_k_m.gguf --host 0.0.0.0 --port 8080 --n-gpu-layers 33                  # tune for 8 GB VRAM --ctx-size 8192 --parallel 2
+      - ./models:/models  # place your .gguf files here before starting
+    # Use YAML list format — inline comments break the folded > syntax
+    command:
+      - --model
+      - /models/llama-3.1-8b-q4_k_m.gguf   # update filename to match your download
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8080"
+      - --n-gpu-layers
+      - "33"       # full offload for 7B Q4 on RTX 3070 Ti; reduce if OOM
+      - --ctx-size
+      - "8192"
+      - --parallel
+      - "2"
     ports:
       - "8080:8080"
     deploy:
@@ -124,12 +137,20 @@ services:
           devices:
             - driver: nvidia
               count: 1
-              capabilities: [ gpu ]
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
     networks:
       - ai-network
+
   # ============================================================================
   # Application Services
   # ============================================================================
+
 
   backend:
     build:
