@@ -221,7 +221,7 @@ Locate the `llamacpp` service and replace the `command` block with proper YAML l
 
 ```yaml
   llamacpp:
-    image: ghcr.io/ggerganov/llama.cpp:server-cuda
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
     container_name: ai-llamacpp
     restart: unless-stopped
     volumes:
