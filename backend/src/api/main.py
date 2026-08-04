@@ -197,8 +197,23 @@ async def chat_completions(request: CompletionRequest, cloud: bool = False):
                 "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
             }
 
+        # Check if user requested cloud deep dive explicitly in message (e.g. "yes", "cloud", "deep dive")
+        cloud_triggers = ["yes", "cloud", "deep dive", "deep-dive", "in-depth", "cloud ai", "openrouter"]
+        is_cloud_request = cloud or any(tr in msg_lower for tr in cloud_triggers)
+
         # Single company analysis mode
-        ticker = found_tickers[0] if found_tickers else "AAPL"
+        ticker = found_tickers[0] if found_tickers else None
+        
+        # If user said "yes" or "deep dive" without a new ticker, look for ticker in previous messages
+        if ticker is None:
+            for m in reversed(request.messages):
+                match = re.search(r"\b([A-Z]{1,5})\b", m.content.upper())
+                if match and match.group(1) not in ["AND", "VS", "THE", "FOR", "YES", "CLOUD"]:
+                    ticker = match.group(1)
+                    break
+        if ticker is None:
+            ticker = "AAPL"
+
         try:
             from src.agents.cio_orchestrator import ChiefInvestmentOfficerAgent
             from src.services.financial_data.yfinance_provider import YFinanceProvider
@@ -208,15 +223,28 @@ async def chat_completions(request: CompletionRequest, cloud: bool = False):
 
             cio = ChiefInvestmentOfficerAgent()
             report = await cio.generate_research_report(
-                ticker=ticker, financial_context=financial_data, route_to_cloud=cloud
+                ticker=ticker, financial_context=financial_data, route_to_cloud=is_cloud_request
             )
 
+            provider_badge = "☁️ Cloud AI (OpenRouter)" if is_cloud_request else "💻 Local AI (Ollama)"
+
+            future_exp_md = "\n".join(f"- {e}" for e in report.future_expectations) if report.future_expectations else "- Strategic position remains supported by core fundamentals."
+            thesis_md = "\n".join(f"- {t}" for t in report.investment_thesis) if report.investment_thesis else "- Solid market positioning."
+            risks_md = "\n".join(f"- {r}" for r in report.key_risks) if report.key_risks else "- Macroeconomic volatility."
+
             content = (
-                f"# Investment Research Report: {report.ticker} — {report.company_name}\n\n"
-                f"**Overall Rating:** {report.overall_rating} &nbsp;|&nbsp; **Conviction Score:** {report.conviction_score}/10\n\n"
-                f"## Executive Summary\n{report.executive_summary}\n\n"
-                f"## Investment Thesis\n" + "\n".join(f"- {t}" for t in report.investment_thesis) + "\n\n"
-                f"## Key Risks\n" + "\n".join(f"- {r}" for r in report.key_risks)
+                f"# Investment Research Report: {report.ticker} — {report.company_name}\n"
+                f"*Analyzed via {provider_badge}*\n\n"
+                f"**Overall Rating:** `{report.overall_rating}` &nbsp;|&nbsp; **Conviction Score:** `{report.conviction_score}/10`\n\n"
+                f"### 🎯 Valuation & \"Is it Worth Buying?\" Verdict\n"
+                f"> **{report.is_worth_buying}**\n\n"
+                f"### 🔮 Future 3-5 Year Expectations & Catalysts\n"
+                f"{future_exp_md}\n\n"
+                f"### 📋 Executive Summary\n{report.executive_summary}\n\n"
+                f"### 💡 Investment Thesis\n{thesis_md}\n\n"
+                f"### ⚠️ Key Risks\n{risks_md}\n\n"
+                f"---\n"
+                f"{report.cloud_deep_dive_prompt}"
             )
         except Exception as e:
             logger.error("CIO agent failed in Open WebUI route", error=str(e), ticker=ticker)
