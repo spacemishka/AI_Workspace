@@ -445,9 +445,22 @@ if (-not $InfraOnly) {
 Write-Step "9" "Verification"
 Write-Host ""
 
+# Parse credentials from .env for verification checks
+$pgUser = "aiworkspace"
+$pgDb = "aiworkspace"
+$redisPass = ""
+if (Test-Path ".env") {
+    $envLines = Get-Content ".env"
+    foreach ($line in $envLines) {
+        if ($line -match "^POSTGRES_USER=(.*)$") { $pgUser = $matches[1].Trim() }
+        if ($line -match "^POSTGRES_DB=(.*)$")   { $pgDb   = $matches[1].Trim() }
+        if ($line -match "^REDIS_PASSWORD=(.*)$") { $redisPass = $matches[1].Trim() }
+    }
+}
+
 $checks = @(
-    @{ Name = "PostgreSQL"; Cmd = { docker exec ai-postgres pg_isready -U aiworkspace -q } },
-    @{ Name = "Redis";      Cmd = { docker exec ai-redis redis-cli -a ($env:REDIS_PASSWORD) ping 2>$null | Select-String "PONG" } },
+    @{ Name = "PostgreSQL"; Cmd = { docker exec ai-postgres pg_isready -U $pgUser -d $pgDb -q } },
+    @{ Name = "Redis";      Cmd = { docker exec ai-redis redis-cli -a $redisPass ping 2>$null | Select-String "PONG" } },
     @{ Name = "Qdrant";     Cmd = { (Invoke-WebRequest "http://localhost:6333/healthz" -UseBasicParsing -TimeoutSec 5).StatusCode -eq 200 } },
     @{ Name = "Langfuse";   Cmd = { (Invoke-WebRequest "http://localhost:3001/api/public/health" -UseBasicParsing -TimeoutSec 5).StatusCode -eq 200 } },
     @{ Name = "Grafana";    Cmd = { (Invoke-WebRequest "http://localhost:3002/api/health" -UseBasicParsing -TimeoutSec 5).StatusCode -eq 200 } },
@@ -458,6 +471,11 @@ if ($backend -eq "ollama") {
     $checks += @{ Name = "Ollama"; Cmd = { (Invoke-WebRequest "http://localhost:11434/api/tags" -UseBasicParsing -TimeoutSec 5).StatusCode -eq 200 } }
 }
 if ($backend -eq "llamacpp") {
+    $hasGguf = (Test-Path "models") -and (Get-ChildItem "models" -Filter "*.gguf" -ErrorAction SilentlyContinue).Count -gt 0
+    if (-not $hasGguf) {
+        Write-Warn "No .gguf model file found in ./models/ directory for llama.cpp."
+        Write-Info "Download a .gguf model (e.g. Llama 3.1 8B Q4_K_M) into ./models/ and restart llamacpp."
+    }
     $checks += @{ Name = "llama.cpp"; Cmd = { (Invoke-WebRequest "http://localhost:8080/health" -UseBasicParsing -TimeoutSec 5).StatusCode -eq 200 } }
 }
 if ($backend -eq "lmstudio") {
