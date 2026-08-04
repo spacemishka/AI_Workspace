@@ -21,8 +21,12 @@ switch ($Command) {
     }
 
     "start-all" {
-        Write-Header "Starting full stack..."
-        docker compose up -d
+        Write-Header "Starting available services..."
+        $services = @("postgres", "redis", "qdrant", "ollama", "open-webui", "langfuse", "prometheus", "grafana")
+        if (Test-Path "backend\Dockerfile") { $services += "backend"; $services += "worker" }
+        if (Test-Path "frontend\Dockerfile") { $services += "frontend" }
+        docker compose up -d $services
+        Write-Host "  Done. Run 'dev.ps1 status' to check." -ForegroundColor Green
     }
 
     "stop" {
