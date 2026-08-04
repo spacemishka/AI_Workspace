@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    AI Workspace — Common development commands
+    AI Workspace - Common development commands
 .DESCRIPTION
     Run with: .\scripts\dev.ps1 <command>
     Commands: start, stop, restart, logs, status, models, migrate, clean
@@ -53,9 +53,9 @@ switch ($Command) {
     }
 
     "models" {
-        Write-Header "Ollama — loaded models & VRAM"
+        Write-Header "Ollama - loaded models and VRAM"
         docker exec ai-ollama ollama ps
-        Write-Header "Ollama — all downloaded models"
+        Write-Header "Ollama - all downloaded models"
         docker exec ai-ollama ollama list
     }
 
@@ -85,16 +85,16 @@ switch ($Command) {
         Write-Host @"
 
   Service URLs:
-    Backend API   →  http://localhost:8000
-    API Docs      →  http://localhost:8000/docs
-    Frontend      →  http://localhost:5173
-    Langfuse      →  http://localhost:3001
-    Grafana       →  http://localhost:3002
-    Prometheus    →  http://localhost:9090
-    Qdrant        →  http://localhost:6333/dashboard
-    Ollama        →  http://localhost:11434
-    llama.cpp     →  http://localhost:8080
-    LM Studio     →  http://localhost:1234
+    Backend API   ->  http://localhost:8000
+    API Docs      ->  http://localhost:8000/docs
+    Frontend      ->  http://localhost:5173
+    Langfuse      ->  http://localhost:3001
+    Grafana       ->  http://localhost:3002
+    Prometheus    ->  http://localhost:9090
+    Qdrant        ->  http://localhost:6333/dashboard
+    Ollama        ->  http://localhost:11434
+    llama.cpp     ->  http://localhost:8080
+    LM Studio     ->  http://localhost:1234
 
 "@ -ForegroundColor Cyan
     }
@@ -102,7 +102,7 @@ switch ($Command) {
     default {
         Write-Host @"
 
-  AI Workspace — Dev Commands
+  AI Workspace - Dev Commands
   Usage: .\scripts\dev.ps1 <command>
 
   Commands:
@@ -120,3 +120,4 @@ switch ($Command) {
 "@ -ForegroundColor White
     }
 }
+
