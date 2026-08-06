@@ -15,6 +15,7 @@ cd ai-workspace
 ```
 
 The wizard will:
+
 - ✅ Check all prerequisites (Docker, GPU, Python)
 - ✅ Ask you to choose an inference backend (Ollama / llama.cpp / LM Studio)
 - ✅ Generate secrets and create your `.env`
@@ -28,22 +29,23 @@ See [docs/setup-guide.md](docs/setup-guide.md) for step-by-step instructions for
 
 ## Service URLs
 
-| Service    | URL                          | Purpose                    |
-|------------|------------------------------|----------------------------|
-| Backend    | http://localhost:8000        | FastAPI REST API           |
-| API Docs   | http://localhost:8000/docs   | OpenAPI / Swagger UI       |
-| Frontend   | http://localhost:5173        | React Web UI               |
-| Langfuse   | http://localhost:3001        | LLM Tracing                |
-| Prometheus | http://localhost:9090        | Metrics                    |
-| Grafana    | http://localhost:3002        | Dashboards (admin/[pass])  |
-| Qdrant     | http://localhost:6333        | Vector DB Dashboard        |
+| Service    | URL                        | Purpose                   |
+| ---------- | -------------------------- | ------------------------- |
+| Backend    | http://localhost:8000      | FastAPI REST API          |
+| API Docs   | http://localhost:8000/docs | OpenAPI / Swagger UI      |
+| Frontend   | http://localhost:5173      | React Web UI              |
+| Langfuse   | http://localhost:3001      | LLM Tracing               |
+| Prometheus | http://localhost:9090      | Metrics                   |
+| Grafana    | http://localhost:3002      | Dashboards (admin/[pass]) |
+| Qdrant     | http://localhost:6333      | Vector DB Dashboard       |
 
 ## Model Routing
 
-| Task | Provider | Notes |
-|------|----------|-------|
+| Task                        | Provider       | Notes               |
+| --------------------------- | -------------- | ------------------- |
 | Simple chat, Q&A, summaries | Local (Ollama) | Private, free, fast |
-| Embeddings & indexing | Local (Ollama) | `nomic-embed-text` |
+| Embeddings & indexing       | Local (Ollama) | `nomic-embed-text`  |
+
 | Complex reasoning, long-context | Cloud (OpenRouter) | Requires API key |
 
 Cloud provider is pluggable — change `CLOUD_PROVIDER` in `.env`.
