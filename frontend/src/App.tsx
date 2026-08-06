@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
+import { MacroBar } from './components/MacroBar';
 import { CompanySearch } from './components/CompanySearch';
 import { FinancialMetrics } from './components/FinancialMetrics';
 import { CompanyComparison } from './components/CompanyComparison';
 import { AgentReport } from './components/AgentReport';
+import { SecFilings } from './components/SecFilings';
+import { MarketNews } from './components/MarketNews';
 import { CompanyAnalysis } from './types';
 import { fetchCompanyAnalysis } from './api';
 
@@ -35,6 +38,7 @@ export const App: React.FC = () => {
   return (
     <div style={{ minHeight: '100vh', paddingBottom: '60px' }}>
       <Header activeTab={activeTab} setActiveTab={setActiveTab} />
+      <MacroBar />
 
       {activeTab === 'analysis' && (
         <>
@@ -47,10 +51,17 @@ export const App: React.FC = () => {
           )}
 
           {analysis && !loading && (
-            <FinancialMetrics
-              analysis={analysis}
-              onRecalculateDCF={(wacc, growth) => loadAnalysis(currentTicker, wacc, growth)}
-            />
+            <>
+              <FinancialMetrics
+                analysis={analysis}
+                onRecalculateDCF={(wacc, growth) => loadAnalysis(currentTicker, wacc, growth)}
+              />
+
+              <div style={{ padding: '0 24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <SecFilings ticker={currentTicker} />
+                <MarketNews ticker={currentTicker} />
+              </div>
+            </>
           )}
         </>
       )}

@@ -1,4 +1,12 @@
-import { CompanyAnalysis, CompanyProfile, ComparisonResponse, CIOReport } from './types';
+import {
+  CompanyAnalysis,
+  CompanyProfile,
+  ComparisonResponse,
+  CIOReport,
+  SECFilingsResponse,
+  NewsResponse,
+  MacroResponse,
+} from './types';
 
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL && import.meta.env.VITE_API_BASE_URL !== 'http://localhost:8000'
@@ -38,3 +46,22 @@ export async function runAgentAnalysis(ticker: string, cloud: boolean = false): 
   if (!res.ok) throw new Error(`Failed agent analysis for ${ticker}`);
   return res.json();
 }
+
+export async function fetchSecFilings(ticker: string): Promise<SECFilingsResponse> {
+  const res = await fetch(`${API_BASE}/api/v1/financials/${ticker}/sec-filings`);
+  if (!res.ok) throw new Error(`Failed to fetch SEC filings for ${ticker}`);
+  return res.json();
+}
+
+export async function fetchCompanyNews(ticker: string): Promise<NewsResponse> {
+  const res = await fetch(`${API_BASE}/api/v1/financials/${ticker}/news`);
+  if (!res.ok) throw new Error(`Failed to fetch news for ${ticker}`);
+  return res.json();
+}
+
+export async function fetchMacroIndicators(): Promise<MacroResponse> {
+  const res = await fetch(`${API_BASE}/api/v1/financials/macro`);
+  if (!res.ok) throw new Error('Failed to fetch macro indicators');
+  return res.json();
+}
+

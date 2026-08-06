@@ -68,3 +68,46 @@ export interface CIOReport {
   financial_statement_analysis?: AgentResult;
   valuation_analysis?: AgentResult;
 }
+
+export interface SECFilingItem {
+  form: string;
+  filing_date?: string;
+  accession_number?: string;
+  description?: string;
+  document_url?: string;
+}
+
+export interface SECFilingsResponse {
+  ticker: string;
+  cik?: string;
+  company_name?: string;
+  sic_description?: string;
+  filings_count: number;
+  filings: SECFilingItem[];
+}
+
+export interface NewsArticle {
+  title: string;
+  link: string;
+  pub_date: string;
+  description: string;
+}
+
+export interface NewsResponse {
+  ticker: string;
+  news_count: number;
+  articles: NewsArticle[];
+}
+
+export interface MacroIndicator {
+  name: string;
+  value: number;
+  unit: string;
+}
+
+export interface MacroResponse {
+  source: string;
+  updated_at: string;
+  indicators: Record<string, MacroIndicator>;
+}
+
