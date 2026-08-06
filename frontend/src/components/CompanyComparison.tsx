@@ -118,7 +118,7 @@ export const CompanyComparison: React.FC = () => {
               </tr>
 
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                <td style={{ padding: '14px 16px', fontWeight 600, color: 'var(--text-muted)' }}>ROE</td>
+                <td style={{ padding: '14px 16px', fontWeight: 600, color: 'var(--text-muted)' }}>ROE</td>
                 {data.map((c) => (
                   <td key={c.ticker} style={{ padding: '14px 16px', fontWeight: 700 }}>{formatPct(c.ratios?.roe)}</td>
                 ))}
